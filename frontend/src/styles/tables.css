@@ -1,0 +1,51 @@
+.page h1 {
+  margin-bottom: 25px;
+}
+
+.customer-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #2d3748;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.customer-table th,
+.customer-table td {
+  padding: 16px;
+  text-align: left;
+}
+
+.customer-table th {
+  background: #2563eb;
+}
+
+.customer-table tr:nth-child(even) {
+  background: #374151;
+}
+
+.customer-table tr:hover {
+  background: #4b5563;
+}
+
+.status {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status.in {
+  background: rgba(34,197,94,.15);
+  color: #22c55e;
+}
+
+.status.low {
+  background: rgba(234,179,8,.15);
+  color: #eab308;
+}
+
+.status.out {
+  background: rgba(239,68,68,.15);
+  color: #ef4444;
+}

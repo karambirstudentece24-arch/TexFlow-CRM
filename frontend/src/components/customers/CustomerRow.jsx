@@ -1,8 +1,6 @@
-function CustomerRow({
-  customer,
-  deleteCustomer,
-  editCustomer,
-}) {
+import { FaEdit, FaTrash } from "react-icons/fa";
+
+function CustomerRow({ customer, deleteCustomer, editCustomer }) {
   return (
     <tr>
       <td>{customer.name}</td>
@@ -10,11 +8,12 @@ function CustomerRow({
       <td>{customer.city}</td>
       <td>{customer.gst}</td>
 
-      <td>
+      <td className="action-buttons">
         <button
           className="edit-btn"
           onClick={() => editCustomer(customer)}
         >
+          <FaEdit />
           Edit
         </button>
 
@@ -22,6 +21,7 @@ function CustomerRow({
           className="delete-btn"
           onClick={() => deleteCustomer(customer.id)}
         >
+          <FaTrash />
           Delete
         </button>
       </td>

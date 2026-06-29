@@ -224,3 +224,166 @@ body {
   border-radius: 8px;
   cursor: pointer;
 }
+.customer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.search-container {
+  position: relative;
+  width: 350px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.search-box {
+  width: 100%;
+  padding: 12px 15px 12px 45px;
+  border: none;
+  border-radius: 10px;
+  background: #374151;
+  color: white;
+  font-size: 15px;
+  outline: none;
+}
+
+.search-box::placeholder {
+  color: #94a3b8;
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.add-btn:hover {
+  background: #1d4ed8;
+}
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-btn,
+.delete-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.edit-btn {
+  background: #2563eb;
+}
+
+.edit-btn:hover {
+  background: #1d4ed8;
+}
+
+.delete-btn {
+  background: #ef4444;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+.status {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status.in {
+  background: rgba(34,197,94,.15);
+  color: #22c55e;
+}
+
+.status.low {
+  background: rgba(234,179,8,.15);
+  color: #eab308;
+}
+
+.status.out {
+  background: rgba(239,68,68,.15);
+  color: #ef4444;
+}
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+  font-size: 38px;
+  margin-bottom: 8px;
+}
+
+.dashboard-header p {
+  color: #94a3b8;
+}
+
+.dashboard-bottom {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 25px;
+  margin-top: 40px;
+}
+
+.recent-orders,
+.quick-stats {
+  background: #2d3748;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.25);
+}
+
+.recent-orders h2,
+.quick-stats h2 {
+  margin-bottom: 20px;
+}
+
+.recent-orders ul {
+  list-style: none;
+}
+
+.recent-orders li {
+  padding: 12px 0;
+  border-bottom: 1px solid #3f4757;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 18px 0;
+  font-size: 17px;
+}
+
+.summary-item strong {
+  color: #60a5fa;
+}
