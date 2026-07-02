@@ -9,17 +9,17 @@ function OrderTable({
   return (
     <table className="customer-table">
       <thead>
-  <tr>
-    <th>Order ID</th>
-    <th>Customer</th>
-    <th>Product</th>
-    <th>Quantity</th>
-    <th>Unit Price</th>
-    <th>Total</th>
-    <th>Status</th>
-    <th>Actions</th>
-  </tr>
-</thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
 
       <tbody>
         {orders

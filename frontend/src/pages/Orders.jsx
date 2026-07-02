@@ -19,10 +19,10 @@ function Orders() {
     return savedCustomers ? JSON.parse(savedCustomers) : [];
   });
 
-  const [products] = useState(() => {
-    const savedProducts = localStorage.getItem("products");
-    return savedProducts ? JSON.parse(savedProducts) : [];
-  });
+  const [products, setProducts] = useState(() => {
+  const savedProducts = localStorage.getItem("products");
+  return savedProducts ? JSON.parse(savedProducts) : [];
+});
 
   useEffect(() => {
     localStorage.setItem("orders", JSON.stringify(orders));
@@ -40,63 +40,142 @@ function Orders() {
     total: "",
     status: "Pending",
   });
+// Save Order
+const saveOrder = () => {
+  if (
+    !newOrder.customer ||
+    !newOrder.product ||
+    !newOrder.quantity ||
+    !newOrder.unitPrice ||
+    !newOrder.total
+  ) {
+    alert("Please fill all fields");
+    return;
+  }
 
-  // Save Order
-  const saveOrder = () => {
-    if (
-      !newOrder.customer ||
-      !newOrder.product ||
-      !newOrder.quantity ||
-      !newOrder.unitPrice ||
-      !newOrder.total
-    ) {
-      alert("Please fill all fields");
-      return;
-    }
+  let updatedProducts = [...products];
 
-    if (editingId !== null) {
-      setOrders(
-        orders.map((order) =>
-          order.id === editingId
-            ? { ...order, ...newOrder }
-            : order
-        )
-      );
-    } else {
-      setOrders([
-        ...orders,
-        {
-          id:
-            "ORD" +
-            (orders.length + 1)
-              .toString()
-              .padStart(3, "0"),
-          ...newOrder,
-        },
-      ]);
-    }
+  if (editingId !== null) {
+    const oldOrder = orders.find(
+      (order) => order.id === editingId
+    );
 
-    setNewOrder({
-      customer: "",
-      product: "",
-      quantity: "",
-      unitPrice: "",
-      total: "",
-      status: "Pending",
-    });
+    // Restore old stock
+    updatedProducts = updatedProducts.map((product) =>
+      product.name === oldOrder.product
+        ? {
+            ...product,
+            stock:
+              Number(product.stock) +
+              Number(oldOrder.quantity),
+          }
+        : product
+    );
+  }
 
-    setEditingId(null);
-    setShowForm(false);
-  };
+  const selectedProduct = updatedProducts.find(
+    (product) => product.name === newOrder.product
+  );
+
+  if (!selectedProduct) {
+    alert("Product not found");
+    return;
+  }
+
+  if (
+    Number(newOrder.quantity) >
+    Number(selectedProduct.stock)
+  ) {
+    alert("Not enough stock available!");
+    return;
+  }
+
+  // Deduct new stock
+  updatedProducts = updatedProducts.map((product) =>
+    product.name === newOrder.product
+      ? {
+          ...product,
+          stock:
+            Number(product.stock) -
+            Number(newOrder.quantity),
+        }
+      : product
+  );
+
+  localStorage.setItem(
+    "products",
+    JSON.stringify(updatedProducts)
+  );
+
+  setProducts(updatedProducts);
+
+  if (editingId !== null) {
+    setOrders(
+      orders.map((order) =>
+        order.id === editingId
+          ? { ...order, ...newOrder }
+          : order
+      )
+    );
+  } else {
+    setOrders([
+      ...orders,
+      {
+        id:
+          "ORD" +
+          (orders.length + 1)
+            .toString()
+            .padStart(3, "0"),
+        ...newOrder,
+      },
+    ]);
+  }
+
+  setNewOrder({
+    customer: "",
+    product: "",
+    quantity: "",
+    unitPrice: "",
+    total: "",
+    status: "Pending",
+  });
+
+  setEditingId(null);
+  setShowForm(false);
+};
 
   // Delete Order
   const deleteOrder = (id) => {
-    if (window.confirm("Delete this order?")) {
-      setOrders(
-        orders.filter((order) => order.id !== id)
-      );
-    }
-  };
+  if (!window.confirm("Delete this order?")) return;
+
+  const orderToDelete = orders.find(
+    (order) => order.id === id
+  );
+
+  if (orderToDelete) {
+    const updatedProducts = products.map((product) => {
+      if (product.name === orderToDelete.product) {
+        return {
+          ...product,
+          stock:
+            Number(product.stock) +
+            Number(orderToDelete.quantity),
+        };
+      }
+
+      return product;
+    });
+
+    localStorage.setItem(
+      "products",
+      JSON.stringify(updatedProducts)
+    );
+  }
+
+  setOrders(
+    orders.filter((order) => order.id !== id)
+  );
+};
 
   // Edit Order
   const editOrder = (order) => {

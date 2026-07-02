@@ -1,6 +1,50 @@
+import { useState, useEffect } from "react";
 import StatCard from "../components/dashboard/StatCard";
 
 function Dashboard() {
+  const [customers, setCustomers] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    const savedCustomers =
+      JSON.parse(localStorage.getItem("customers")) || [];
+
+    const savedProducts =
+      JSON.parse(localStorage.getItem("products")) || [];
+
+    const savedOrders =
+      JSON.parse(localStorage.getItem("orders")) || [];
+
+    setCustomers(savedCustomers);
+    setProducts(savedProducts);
+    setOrders(savedOrders);
+  }, []);
+
+  // Inventory Value
+  const inventoryValue = products.reduce(
+    (total, product) =>
+      total +
+      Number(product.price) * Number(product.stock),
+    0
+  );
+
+  // Revenue
+  const totalRevenue = orders.reduce(
+    (total, order) => total + Number(order.total),
+    0
+  );
+
+  // Pending Orders
+  const pendingOrders = orders.filter(
+    (order) => order.status === "Pending"
+  ).length;
+
+  // Low Stock
+  const lowStock = products.filter(
+    (product) => Number(product.stock) <= 10
+  ).length;
+
   return (
     <div className="dashboard">
       <div className="dashboard-header">
@@ -11,20 +55,45 @@ function Dashboard() {
       </div>
 
       <div className="cards">
-        <StatCard title="Total Customers" value="3" />
-        <StatCard title="Products" value="3" />
-        <StatCard title="Total Orders" value="0" />
-        <StatCard title="Inventory Value" value="₹0" />
+        <StatCard
+          title="Total Customers"
+          value={customers.length}
+        />
+
+        <StatCard
+          title="Products"
+          value={products.length}
+        />
+
+        <StatCard
+          title="Total Orders"
+          value={orders.length}
+        />
+
+        <StatCard
+          title="Inventory Value"
+          value={`₹${inventoryValue}`}
+        />
       </div>
 
       <div className="dashboard-bottom">
         <div className="recent-orders">
-          <h2>Recent Activity</h2>
+          <h2>Recent Orders</h2>
 
           <ul>
-            <li>✅ Customer "ABC Textiles" added.</li>
-            <li>📦 Product "Cotton Fabric" updated.</li>
-            <li>🛒 Order module coming soon...</li>
+            {orders.length === 0 ? (
+              <li>No orders yet.</li>
+            ) : (
+              orders
+                .slice(-5)
+                .reverse()
+                .map((order) => (
+                  <li key={order.id}>
+                    🛒 {order.id} - {order.product} (
+                    {order.quantity})
+                  </li>
+                ))
+            )}
           </ul>
         </div>
 
@@ -33,17 +102,17 @@ function Dashboard() {
 
           <div className="summary-item">
             <span>Total Revenue</span>
-            <strong>₹0</strong>
+            <strong>₹{totalRevenue}</strong>
           </div>
 
           <div className="summary-item">
             <span>Pending Orders</span>
-            <strong>0</strong>
+            <strong>{pendingOrders}</strong>
           </div>
 
           <div className="summary-item">
             <span>Low Stock Products</span>
-            <strong>1</strong>
+            <strong>{lowStock}</strong>
           </div>
         </div>
       </div>

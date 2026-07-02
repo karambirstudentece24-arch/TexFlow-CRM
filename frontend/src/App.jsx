@@ -2,11 +2,13 @@ import "./App.css";
 
 import Navbar from "./components/layout/Navbar";
 import Sidebar from "./components/layout/Sidebar";
+
 import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
 import Products from "./pages/Products";
 import Orders from "./pages/Orders";
 import Inventory from "./pages/Inventory";
+import Invoice from "./pages/Invoice";
 
 import { Routes, Route } from "react-router-dom";
 
@@ -21,10 +23,31 @@ function App() {
         <div className="content">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/inventory" element={<Inventory />} />
+
+            <Route
+              path="/customers"
+              element={<Customers />}
+            />
+
+            <Route
+              path="/products"
+              element={<Products />}
+            />
+
+            <Route
+              path="/orders"
+              element={<Orders />}
+            />
+
+            <Route
+              path="/inventory"
+              element={<Inventory />}
+            />
+
+            <Route
+              path="/invoice/:id"
+              element={<Invoice />}
+            />
           </Routes>
         </div>
       </div>

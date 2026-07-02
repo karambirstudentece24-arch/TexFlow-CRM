@@ -1,10 +1,13 @@
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaFileInvoice } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 function OrderRow({
   order,
   editOrder,
   deleteOrder,
 }) {
+  const navigate = useNavigate();
+
   const getStatus = () => {
     switch (order.status) {
       case "Completed":
@@ -56,6 +59,16 @@ function OrderRow({
         >
           <FaTrash />
           Delete
+        </button>
+
+        <button
+          className="save-btn"
+          onClick={() =>
+            navigate(`/invoice/${order.id}`)
+          }
+        >
+          <FaFileInvoice />
+          Invoice
         </button>
       </td>
     </tr>
