@@ -4,45 +4,15 @@ import SearchProduct from "../components/products/SearchProduct";
 import ProductTable from "../components/products/ProductTable";
 import ProductModal from "../components/products/ProductModal";
 
+import {
+  getProducts,
+  addProduct,
+  updateProduct,
+  deleteProduct as deleteProductAPI,
+} from "../services/productService";
+
 function Products() {
-  const defaultProducts = [
-    {
-      id: 1,
-      name: "Cotton Fabric",
-      category: "Fabric",
-      price: 250,
-      stock: 45,
-    },
-    {
-      id: 2,
-      name: "Silk Saree",
-      category: "Garments",
-      price: 1800,
-      stock: 12,
-    },
-    {
-      id: 3,
-      name: "Denim Jeans",
-      category: "Garments",
-      price: 1200,
-      stock: 28,
-    },
-  ];
-
-  const [products, setProducts] = useState(() => {
-    const savedProducts = localStorage.getItem("products");
-
-    return savedProducts
-      ? JSON.parse(savedProducts)
-      : defaultProducts;
-  });
-
-  useEffect(() => {
-    localStorage.setItem(
-      "products",
-      JSON.stringify(products)
-    );
-  }, [products]);
+  const [products, setProducts] = useState([]);
 
   const [search, setSearch] = useState("");
 
@@ -57,7 +27,20 @@ function Products() {
     stock: "",
   });
 
-  const saveProduct = () => {
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const data = await getProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const saveProduct = async () => {
     if (
       newProduct.name === "" ||
       newProduct.category === "" ||
@@ -68,46 +51,43 @@ function Products() {
       return;
     }
 
-    if (editingId !== null) {
-      setProducts(
-        products.map((product) =>
-          product.id === editingId
-            ? { ...product, ...newProduct }
-            : product
-        )
-      );
-    } else {
-      setProducts([
-        ...products,
-        {
-          id: Date.now(),
-          ...newProduct,
-        },
-      ]);
+    try {
+      if (editingId) {
+        await updateProduct(editingId, newProduct);
+      } else {
+        await addProduct(newProduct);
+      }
+
+      await fetchProducts();
+
+      setNewProduct({
+        name: "",
+        category: "",
+        price: "",
+        stock: "",
+      });
+
+      setEditingId(null);
+
+      setShowForm(false);
+    } catch (error) {
+      console.error(error);
     }
-
-    setNewProduct({
-      name: "",
-      category: "",
-      price: "",
-      stock: "",
-    });
-
-    setEditingId(null);
-
-    setShowForm(false);
   };
 
-  const deleteProduct = (id) => {
-    if (window.confirm("Delete this product?")) {
-      setProducts(
-        products.filter((product) => product.id !== id)
-      );
+  const deleteProduct = async (id) => {
+    if (!window.confirm("Delete this product?")) return;
+
+    try {
+      await deleteProductAPI(id);
+      await fetchProducts();
+    } catch (error) {
+      console.error(error);
     }
   };
 
   const editProduct = (product) => {
-    setEditingId(product.id);
+    setEditingId(product._id);
 
     setNewProduct({
       name: product.name,

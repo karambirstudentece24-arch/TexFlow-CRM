@@ -32,7 +32,10 @@ function OrderModal({
           <option value="">Select Customer</option>
 
           {customers.map((customer) => (
-            <option key={customer.id} value={customer.name}>
+            <option
+              key={customer._id}
+              value={customer.name}
+            >
               {customer.name}
             </option>
           ))}
@@ -42,30 +45,21 @@ function OrderModal({
 
         <select
           value={newOrder.product}
-          onChange={(e) => {
-            const selectedProduct = products.find(
-              (product) => product.name === e.target.value
-            );
-
-            const unitPrice = selectedProduct
-              ? Number(selectedProduct.price)
-              : 0;
-
-            const quantity = Number(newOrder.quantity || 0);
-
+          onChange={(e) =>
             setNewOrder({
               ...newOrder,
               product: e.target.value,
-              unitPrice,
-              total: unitPrice * quantity,
-            });
-          }}
+            })
+          }
           className="search-box"
         >
           <option value="">Select Product</option>
 
           {products.map((product) => (
-            <option key={product.id} value={product.name}>
+            <option
+              key={product._id}
+              value={product.name}
+            >
               {product.name}
             </option>
           ))}
@@ -77,34 +71,12 @@ function OrderModal({
           type="number"
           placeholder="Quantity"
           value={newOrder.quantity}
-          onChange={(e) => {
-            const quantity = Number(e.target.value);
-
+          onChange={(e) =>
             setNewOrder({
               ...newOrder,
-              quantity,
-              total:
-                quantity * Number(newOrder.unitPrice || 0),
-            });
-          }}
-        />
-
-        {/* Unit Price */}
-
-        <input
-          type="number"
-          placeholder="Unit Price"
-          value={newOrder.unitPrice}
-          readOnly
-        />
-
-        {/* Total */}
-
-        <input
-          type="number"
-          placeholder="Total Amount"
-          value={newOrder.total}
-          readOnly
+              quantity: Number(e.target.value),
+            })
+          }
         />
 
         {/* Status */}
@@ -141,8 +113,6 @@ function OrderModal({
                 customer: "",
                 product: "",
                 quantity: "",
-                unitPrice: "",
-                total: "",
                 status: "Pending",
               });
             }}

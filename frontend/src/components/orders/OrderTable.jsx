@@ -30,7 +30,7 @@ function OrderTable({
           )
           .map((order) => (
             <OrderRow
-              key={order.id}
+              key={order._id}
               order={order}
               editOrder={editOrder}
               deleteOrder={deleteOrder}

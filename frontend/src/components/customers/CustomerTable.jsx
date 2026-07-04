@@ -27,7 +27,7 @@ function CustomerTable({
           )
           .map((customer) => (
             <CustomerRow
-              key={customer.id}
+              key={customer._id}
               customer={customer}
               deleteCustomer={deleteCustomer}
               editCustomer={editCustomer}

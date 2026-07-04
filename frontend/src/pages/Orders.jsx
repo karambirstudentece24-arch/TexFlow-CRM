@@ -4,29 +4,20 @@ import SearchOrder from "../components/orders/SearchOrder";
 import OrderTable from "../components/orders/OrderTable";
 import OrderModal from "../components/orders/OrderModal";
 
+import {
+  getOrders,
+  addOrder as addOrderAPI,
+  updateOrder,
+  deleteOrder as deleteOrderAPI,
+} from "../services/orderService";
+
+import { getCustomers } from "../services/customerService";
+import { getProducts } from "../services/productService";
+
 function Orders() {
-  const defaultOrders = [];
-
-  const [orders, setOrders] = useState(() => {
-    const savedOrders = localStorage.getItem("orders");
-    return savedOrders
-      ? JSON.parse(savedOrders)
-      : defaultOrders;
-  });
-
-  const [customers] = useState(() => {
-    const savedCustomers = localStorage.getItem("customers");
-    return savedCustomers ? JSON.parse(savedCustomers) : [];
-  });
-
-  const [products, setProducts] = useState(() => {
-  const savedProducts = localStorage.getItem("products");
-  return savedProducts ? JSON.parse(savedProducts) : [];
-});
-
-  useEffect(() => {
-    localStorage.setItem("orders", JSON.stringify(orders));
-  }, [orders]);
+  const [orders, setOrders] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [products, setProducts] = useState([]);
 
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -36,164 +27,105 @@ function Orders() {
     customer: "",
     product: "",
     quantity: "",
-    unitPrice: "",
-    total: "",
-    status: "Pending",
-  });
-// Save Order
-const saveOrder = () => {
-  if (
-    !newOrder.customer ||
-    !newOrder.product ||
-    !newOrder.quantity ||
-    !newOrder.unitPrice ||
-    !newOrder.total
-  ) {
-    alert("Please fill all fields");
-    return;
-  }
-
-  let updatedProducts = [...products];
-
-  if (editingId !== null) {
-    const oldOrder = orders.find(
-      (order) => order.id === editingId
-    );
-
-    // Restore old stock
-    updatedProducts = updatedProducts.map((product) =>
-      product.name === oldOrder.product
-        ? {
-            ...product,
-            stock:
-              Number(product.stock) +
-              Number(oldOrder.quantity),
-          }
-        : product
-    );
-  }
-
-  const selectedProduct = updatedProducts.find(
-    (product) => product.name === newOrder.product
-  );
-
-  if (!selectedProduct) {
-    alert("Product not found");
-    return;
-  }
-
-  if (
-    Number(newOrder.quantity) >
-    Number(selectedProduct.stock)
-  ) {
-    alert("Not enough stock available!");
-    return;
-  }
-
-  // Deduct new stock
-  updatedProducts = updatedProducts.map((product) =>
-    product.name === newOrder.product
-      ? {
-          ...product,
-          stock:
-            Number(product.stock) -
-            Number(newOrder.quantity),
-        }
-      : product
-  );
-
-  localStorage.setItem(
-    "products",
-    JSON.stringify(updatedProducts)
-  );
-
-  setProducts(updatedProducts);
-
-  if (editingId !== null) {
-    setOrders(
-      orders.map((order) =>
-        order.id === editingId
-          ? { ...order, ...newOrder }
-          : order
-      )
-    );
-  } else {
-    setOrders([
-      ...orders,
-      {
-        id:
-          "ORD" +
-          (orders.length + 1)
-            .toString()
-            .padStart(3, "0"),
-        ...newOrder,
-      },
-    ]);
-  }
-
-  setNewOrder({
-    customer: "",
-    product: "",
-    quantity: "",
-    unitPrice: "",
-    total: "",
     status: "Pending",
   });
 
-  setEditingId(null);
-  setShowForm(false);
-};
+  useEffect(() => {
+    fetchOrders();
+    fetchCustomers();
+    fetchProducts();
+  }, []);
 
-  // Delete Order
-  const deleteOrder = (id) => {
-  if (!window.confirm("Delete this order?")) return;
+  const fetchOrders = async () => {
+    try {
+      const data = await getOrders();
+      setOrders(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  const orderToDelete = orders.find(
-    (order) => order.id === id
-  );
+  const fetchCustomers = async () => {
+    try {
+      const data = await getCustomers();
+      setCustomers(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  if (orderToDelete) {
-    const updatedProducts = products.map((product) => {
-      if (product.name === orderToDelete.product) {
-        return {
-          ...product,
-          stock:
-            Number(product.stock) +
-            Number(orderToDelete.quantity),
-        };
+  const fetchProducts = async () => {
+    try {
+      const data = await getProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const saveOrder = async () => {
+    if (
+      !newOrder.customer ||
+      !newOrder.product ||
+      !newOrder.quantity
+    ) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    try {
+      if (editingId) {
+        await updateOrder(editingId, newOrder);
+      } else {
+        await addOrderAPI(newOrder);
       }
 
-      return product;
-    });
+      await fetchOrders();
+      await fetchProducts();
 
-    localStorage.setItem(
-      "products",
-      JSON.stringify(updatedProducts)
-    );
-  }
+      setNewOrder({
+        customer: "",
+        product: "",
+        quantity: "",
+        status: "Pending",
+      });
 
-  setOrders(
-    orders.filter((order) => order.id !== id)
-  );
-};
+      setEditingId(null);
+      setShowForm(false);
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "Failed to save order"
+      );
+    }
+  };
 
-  // Edit Order
+  const deleteOrder = async (id) => {
+    if (!window.confirm("Delete this order?")) return;
+
+    try {
+      await deleteOrderAPI(id);
+
+      await fetchOrders();
+      await fetchProducts();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const editOrder = (order) => {
-    setEditingId(order.id);
+    setEditingId(order._id);
 
     setNewOrder({
       customer: order.customer,
       product: order.product,
       quantity: order.quantity,
-      unitPrice: order.unitPrice,
-      total: order.total,
       status: order.status,
     });
 
     setShowForm(true);
   };
-
-  return (
+    return (
     <div className="page">
       <h1>Orders</h1>
 

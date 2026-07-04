@@ -1,4 +1,8 @@
-import { FaEdit, FaTrash, FaFileInvoice } from "react-icons/fa";
+import {
+  FaEdit,
+  FaTrash,
+  FaFileInvoice,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 function OrderRow({
@@ -30,7 +34,7 @@ function OrderRow({
 
   return (
     <tr>
-      <td>{order.id}</td>
+      <td>{order._id.slice(-6).toUpperCase()}</td>
 
       <td>{order.customer}</td>
 
@@ -55,7 +59,7 @@ function OrderRow({
 
         <button
           className="delete-btn"
-          onClick={() => deleteOrder(order.id)}
+          onClick={() => deleteOrder(order._id)}
         >
           <FaTrash />
           Delete
@@ -64,7 +68,7 @@ function OrderRow({
         <button
           className="save-btn"
           onClick={() =>
-            navigate(`/invoice/${order.id}`)
+            navigate(`/invoice/${order._id}`)
           }
         >
           <FaFileInvoice />

@@ -20,8 +20,11 @@ function ProductRow({
   return (
     <tr>
       <td>{product.name}</td>
+
       <td>{product.category}</td>
+
       <td>₹{product.price}</td>
+
       <td>{product.stock}</td>
 
       <td>{getStatus()}</td>
@@ -37,7 +40,7 @@ function ProductRow({
 
         <button
           className="delete-btn"
-          onClick={() => deleteProduct(product.id)}
+          onClick={() => deleteProduct(product._id)}
         >
           <FaTrash />
           Delete

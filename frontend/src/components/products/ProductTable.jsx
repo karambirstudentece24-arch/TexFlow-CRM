@@ -28,7 +28,7 @@ function ProductTable({
           )
           .map((product) => (
             <ProductRow
-              key={product.id}
+              key={product._id}
               product={product}
               deleteProduct={deleteProduct}
               editProduct={editProduct}

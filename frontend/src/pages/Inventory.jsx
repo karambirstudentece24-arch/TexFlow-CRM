@@ -1,14 +1,21 @@
 import { useState, useEffect } from "react";
+import { getProducts } from "../services/productService";
 
 function Inventory() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const savedProducts =
-      JSON.parse(localStorage.getItem("products")) || [];
-
-    setProducts(savedProducts);
+    fetchProducts();
   }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const data = await getProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const getStatus = (stock) => {
     if (stock === 0)
@@ -37,7 +44,7 @@ function Inventory() {
 
         <tbody>
           {products.map((product) => (
-            <tr key={product.id}>
+            <tr key={product._id}>
               <td>{product.name}</td>
 
               <td>{product.category}</td>

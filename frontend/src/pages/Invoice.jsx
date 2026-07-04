@@ -1,4 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -6,13 +8,36 @@ function Invoice() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const orders =
-    JSON.parse(localStorage.getItem("orders")) || [];
+  const [order, setOrder] = useState(null);
+  const [customer, setCustomer] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const customers =
-    JSON.parse(localStorage.getItem("customers")) || [];
+  useEffect(() => {
+    fetchInvoice();
+  }, []);
 
-  const order = orders.find((o) => o.id === id);
+  const fetchInvoice = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/orders/${id}/invoice`
+      );
+
+      setOrder(response.data.order);
+      setCustomer(response.data.customer);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="page">
+        <h2>Loading Invoice...</h2>
+      </div>
+    );
+  }
 
   if (!order) {
     return (
@@ -29,10 +54,6 @@ function Invoice() {
     );
   }
 
-  const customer = customers.find(
-    (c) => c.name === order.customer
-  );
-
   const subtotal = Number(order.total);
   const gst = subtotal * 0.18;
   const grandTotal = subtotal + gst;
@@ -48,9 +69,9 @@ function Invoice() {
 
     doc.setFontSize(12);
 
-    doc.text(`Invoice No : ${order.id}`, 15, 45);
+    doc.text(`Invoice No : ${order._id}`, 15, 45);
     doc.text(
-      `Date : ${new Date().toLocaleDateString()}`,
+      `Date : ${new Date(order.createdAt).toLocaleDateString()}`,
       15,
       53
     );
@@ -105,7 +126,7 @@ function Invoice() {
       finalY + 35
     );
 
-    doc.save(`Invoice-${order.id}.pdf`);
+    doc.save(`Invoice-${order._id}.pdf`);
   };
 
   return (
@@ -118,12 +139,12 @@ function Invoice() {
         <hr />
 
         <p>
-          <strong>Invoice No:</strong> {order.id}
+          <strong>Invoice No:</strong> {order._id}
         </p>
 
         <p>
           <strong>Date:</strong>{" "}
-          {new Date().toLocaleDateString()}
+          {new Date(order.createdAt).toLocaleDateString()}
         </p>
 
         <hr />

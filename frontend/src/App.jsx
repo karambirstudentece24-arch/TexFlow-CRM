@@ -9,10 +9,31 @@ import Products from "./pages/Products";
 import Orders from "./pages/Orders";
 import Inventory from "./pages/Inventory";
 import Invoice from "./pages/Invoice";
+import SalesReports from "./pages/SalesReports";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
-import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import RoleProtectedRoute from "./components/RoleProtectedRoute";
+
+import { Routes, Route, useLocation } from "react-router-dom";
 
 function App() {
+  const location = useLocation();
+
+  const authPages =
+    location.pathname === "/login" ||
+    location.pathname === "/register";
+
+  if (authPages) {
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    );
+  }
+
   return (
     <div className="app">
       <Navbar />
@@ -22,31 +43,73 @@ function App() {
 
         <div className="content">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
 
             <Route
               path="/customers"
-              element={<Customers />}
+              element={
+                <ProtectedRoute>
+                  <Customers />
+                </ProtectedRoute>
+              }
             />
 
             <Route
               path="/products"
-              element={<Products />}
+              element={
+                <RoleProtectedRoute
+                  allowedRoles={["Admin", "Manager"]}
+                >
+                  <Products />
+                </RoleProtectedRoute>
+              }
             />
 
             <Route
               path="/orders"
-              element={<Orders />}
+              element={
+                <ProtectedRoute>
+                  <Orders />
+                </ProtectedRoute>
+              }
             />
 
             <Route
               path="/inventory"
-              element={<Inventory />}
+              element={
+                <RoleProtectedRoute
+                  allowedRoles={["Admin", "Manager"]}
+                >
+                  <Inventory />
+                </RoleProtectedRoute>
+              }
             />
 
             <Route
               path="/invoice/:id"
-              element={<Invoice />}
+              element={
+                <ProtectedRoute>
+                  <Invoice />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/sales-reports"
+              element={
+                <RoleProtectedRoute
+                  allowedRoles={["Admin"]}
+                >
+                  <SalesReports />
+                </RoleProtectedRoute>
+              }
             />
           </Routes>
         </div>

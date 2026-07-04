@@ -4,37 +4,15 @@ import SearchBar from "../components/customers/SearchBar";
 import CustomerTable from "../components/customers/CustomerTable";
 import CustomerModal from "../components/customers/CustomerModal";
 
-function Customers() {
-  const defaultCustomers = [
-    {
-      id: 1,
-      name: "ABC Textiles",
-      phone: "9876543210",
-      city: "Surat",
-      gst: "24ABCDE1234F1Z5",
-    },
-    {
-      id: 2,
-      name: "XYZ Fabrics",
-      phone: "9876500000",
-      city: "Ahmedabad",
-      gst: "24PQRS1234A1Z2",
-    },
-    {
-      id: 3,
-      name: "Fashion Hub",
-      phone: "9123456780",
-      city: "Mumbai",
-      gst: "27AAAAA1111A1Z1",
-    },
-  ];
+import {
+  getCustomers,
+  addCustomer as addCustomerAPI,
+  updateCustomer,
+  deleteCustomer as deleteCustomerAPI,
+} from "../services/customerService";
 
-  const [customers, setCustomers] = useState(() => {
-    const savedCustomers = localStorage.getItem("customers");
-    return savedCustomers
-      ? JSON.parse(savedCustomers)
-      : defaultCustomers;
-  });
+function Customers() {
+  const [customers, setCustomers] = useState([]);
 
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -47,16 +25,20 @@ function Customers() {
     gst: "",
   });
 
-  // Save customers to Local Storage
   useEffect(() => {
-    localStorage.setItem(
-      "customers",
-      JSON.stringify(customers)
-    );
-  }, [customers]);
+    fetchCustomers();
+  }, []);
 
-  // Add or Update Customer
-  const addCustomer = () => {
+  const fetchCustomers = async () => {
+    try {
+      const data = await getCustomers();
+      setCustomers(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const addCustomer = async () => {
     if (
       !newCustomer.name ||
       !newCustomer.phone ||
@@ -67,53 +49,47 @@ function Customers() {
       return;
     }
 
-    if (editingId !== null) {
-      setCustomers(
-        customers.map((customer) =>
-          customer.id === editingId
-            ? { ...customer, ...newCustomer }
-            : customer
-        )
-      );
-    } else {
-      setCustomers([
-        ...customers,
-        {
-          id: Date.now(),
-          ...newCustomer,
-        },
-      ]);
-    }
+    try {
+      if (editingId) {
+        await updateCustomer(editingId, newCustomer);
+      } else {
+        await addCustomerAPI(newCustomer);
+      }
 
-    setNewCustomer({
-      name: "",
-      phone: "",
-      city: "",
-      gst: "",
-    });
+      await fetchCustomers();
 
-    setEditingId(null);
-    setShowForm(false);
-  };
+      setNewCustomer({
+        name: "",
+        phone: "",
+        city: "",
+        gst: "",
+      });
 
-  // Delete Customer
-  const deleteCustomer = (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this customer?"
-    );
-
-    if (confirmDelete) {
-      setCustomers(
-        customers.filter(
-          (customer) => customer.id !== id
-        )
-      );
+      setEditingId(null);
+      setShowForm(false);
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  // Edit Customer
+  const deleteCustomer = async (id) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this customer?"
+      )
+    )
+      return;
+
+    try {
+      await deleteCustomerAPI(id);
+      await fetchCustomers();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const editCustomer = (customer) => {
-    setEditingId(customer.id);
+    setEditingId(customer._id);
 
     setNewCustomer({
       name: customer.name,

@@ -1,49 +1,61 @@
 import { useState, useEffect } from "react";
 import StatCard from "../components/dashboard/StatCard";
+import RevenueChart from "../components/dashboard/RevenueChart";
+import TopProductsChart from "../components/dashboard/TopProductsChart";
+
+import {
+  getDashboardStats,
+  getTopProducts,
+} from "../services/dashboardService";
+
+import { getOrders } from "../services/orderService";
 
 function Dashboard() {
-  const [customers, setCustomers] = useState([]);
-  const [products, setProducts] = useState([]);
+  const [stats, setStats] = useState({
+    totalCustomers: 0,
+    totalProducts: 0,
+    totalOrders: 0,
+    inventoryValue: 0,
+    revenue: 0,
+    pendingOrders: 0,
+    lowStockProducts: 0,
+  });
+
   const [orders, setOrders] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
 
   useEffect(() => {
-    const savedCustomers =
-      JSON.parse(localStorage.getItem("customers")) || [];
-
-    const savedProducts =
-      JSON.parse(localStorage.getItem("products")) || [];
-
-    const savedOrders =
-      JSON.parse(localStorage.getItem("orders")) || [];
-
-    setCustomers(savedCustomers);
-    setProducts(savedProducts);
-    setOrders(savedOrders);
+    fetchDashboard();
+    fetchOrders();
+    fetchTopProducts();
   }, []);
 
-  // Inventory Value
-  const inventoryValue = products.reduce(
-    (total, product) =>
-      total +
-      Number(product.price) * Number(product.stock),
-    0
-  );
+  const fetchDashboard = async () => {
+    try {
+      const data = await getDashboardStats();
+      setStats(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  // Revenue
-  const totalRevenue = orders.reduce(
-    (total, order) => total + Number(order.total),
-    0
-  );
+  const fetchOrders = async () => {
+    try {
+      const data = await getOrders();
+      setOrders(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  // Pending Orders
-  const pendingOrders = orders.filter(
-    (order) => order.status === "Pending"
-  ).length;
-
-  // Low Stock
-  const lowStock = products.filter(
-    (product) => Number(product.stock) <= 10
-  ).length;
+  const fetchTopProducts = async () => {
+    try {
+      const data = await getTopProducts();
+      setTopProducts(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="dashboard">
@@ -54,29 +66,41 @@ function Dashboard() {
         </div>
       </div>
 
+      {/* Dashboard Cards */}
+
       <div className="cards">
         <StatCard
           title="Total Customers"
-          value={customers.length}
+          value={stats.totalCustomers}
         />
 
         <StatCard
           title="Products"
-          value={products.length}
+          value={stats.totalProducts}
         />
 
         <StatCard
           title="Total Orders"
-          value={orders.length}
+          value={stats.totalOrders}
         />
 
         <StatCard
           title="Inventory Value"
-          value={`₹${inventoryValue}`}
+          value={`₹${stats.inventoryValue}`}
         />
       </div>
 
+      {/* Revenue Chart */}
+
+      <div style={{ marginTop: "25px" }}>
+        <RevenueChart orders={orders} />
+      </div>
+
+      {/* Bottom Section */}
+
       <div className="dashboard-bottom">
+        {/* Recent Orders */}
+
         <div className="recent-orders">
           <h2>Recent Orders</h2>
 
@@ -88,8 +112,9 @@ function Dashboard() {
                 .slice(-5)
                 .reverse()
                 .map((order) => (
-                  <li key={order.id}>
-                    🛒 {order.id} - {order.product} (
+                  <li key={order._id}>
+                    🛒 {order.customer} ordered{" "}
+                    <strong>{order.product}</strong> (
                     {order.quantity})
                   </li>
                 ))
@@ -97,24 +122,32 @@ function Dashboard() {
           </ul>
         </div>
 
+        {/* Business Summary */}
+
         <div className="quick-stats">
           <h2>Business Summary</h2>
 
           <div className="summary-item">
             <span>Total Revenue</span>
-            <strong>₹{totalRevenue}</strong>
+            <strong>₹{stats.revenue}</strong>
           </div>
 
           <div className="summary-item">
             <span>Pending Orders</span>
-            <strong>{pendingOrders}</strong>
+            <strong>{stats.pendingOrders}</strong>
           </div>
 
           <div className="summary-item">
             <span>Low Stock Products</span>
-            <strong>{lowStock}</strong>
+            <strong>{stats.lowStockProducts}</strong>
           </div>
         </div>
+      </div>
+
+      {/* Top Selling Products */}
+
+      <div style={{ marginTop: "25px" }}>
+        <TopProductsChart products={topProducts} />
       </div>
     </div>
   );
