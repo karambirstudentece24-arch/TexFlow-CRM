@@ -9,11 +9,13 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+import API_URL from "../../config/api";
+
 function RevenueChart() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/dashboard/analytics")
+    fetch(`${API_URL}/dashboard/analytics`)
       .then((res) => res.json())
       .then((result) => {
         setData(result.monthlyRevenue);

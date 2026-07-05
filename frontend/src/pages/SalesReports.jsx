@@ -3,6 +3,7 @@ import axios from "axios";
 
 import MonthlyRevenueChart from "../components/dashboard/MonthlyRevenueChart";
 import { getAnalytics } from "../services/dashboardService";
+import API_URL from "../config/api";
 
 function SalesReports() {
   const [stats, setStats] = useState({
@@ -23,9 +24,7 @@ function SalesReports() {
 
   const fetchDashboard = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:8000/api/dashboard"
-      );
+      const res = await axios.get(`${API_URL}/dashboard`);
 
       setStats(res.data);
     } catch (err) {
@@ -35,9 +34,7 @@ function SalesReports() {
 
   const fetchTopProducts = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:8000/api/dashboard/top-products"
-      );
+      const res = await axios.get(`${API_URL}/dashboard/top-products`);
 
       setTopProducts(res.data);
     } catch (err) {

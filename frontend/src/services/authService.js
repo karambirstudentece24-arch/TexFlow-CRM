@@ -1,11 +1,10 @@
 import axios from "axios";
-
-const API_URL = "http://localhost:8000/api/auth";
+import API_URL from "../config/api";
 
 // Register
 export const register = async (userData) => {
   const response = await axios.post(
-    `${API_URL}/register`,
+    `${API_URL}/auth/register`,
     userData
   );
 
@@ -15,7 +14,7 @@ export const register = async (userData) => {
 // Login
 export const login = async (userData) => {
   const response = await axios.post(
-    `${API_URL}/login`,
+    `${API_URL}/auth/login`,
     userData
   );
 
@@ -25,7 +24,7 @@ export const login = async (userData) => {
 // Get Logged-in User
 export const getProfile = async (token) => {
   const response = await axios.get(
-    `${API_URL}/profile`,
+    `${API_URL}/auth/profile`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

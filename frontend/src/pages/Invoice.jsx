@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import API_URL from "../config/api";
 
 function Invoice() {
   const { id } = useParams();
@@ -19,9 +20,8 @@ function Invoice() {
   const fetchInvoice = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/orders/${id}/invoice`
-      );
-
+  `${API_URL}/orders/${id}/invoice`
+);
       setOrder(response.data.order);
       setCustomer(response.data.customer);
     } catch (error) {
