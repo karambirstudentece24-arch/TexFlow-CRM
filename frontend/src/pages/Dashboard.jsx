@@ -88,6 +88,20 @@ function Dashboard() {
           title="Inventory Value"
           value={`₹${stats.inventoryValue}`}
         />
+        <StatCard
+  title="Revenue"
+  value={`₹${stats.revenue}`}
+/>
+
+<StatCard
+  title="Pending Orders"
+  value={stats.pendingOrders}
+/>
+
+<StatCard
+  title="Low Stock"
+  value={stats.lowStockProducts}
+/>
       </div>
 
       {/* Revenue Chart */}

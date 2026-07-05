@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+import MonthlyRevenueChart from "../components/dashboard/MonthlyRevenueChart";
+import { getAnalytics } from "../services/dashboardService";
+
 function SalesReports() {
   const [stats, setStats] = useState({
     revenue: 0,
@@ -10,10 +13,12 @@ function SalesReports() {
   });
 
   const [topProducts, setTopProducts] = useState([]);
+  const [analytics, setAnalytics] = useState([]);
 
   useEffect(() => {
     fetchDashboard();
     fetchTopProducts();
+    fetchAnalytics();
   }, []);
 
   const fetchDashboard = async () => {
@@ -40,9 +45,20 @@ function SalesReports() {
     }
   };
 
+  const fetchAnalytics = async () => {
+    try {
+      const data = await getAnalytics();
+      setAnalytics(data.monthlyRevenue);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="dashboard">
       <h1>Sales Reports</h1>
+
+      {/* Statistics Cards */}
 
       <div className="cards">
         <div className="stat-card">
@@ -66,6 +82,14 @@ function SalesReports() {
         </div>
       </div>
 
+      {/* Monthly Revenue Chart */}
+
+      <div style={{ marginTop: "30px" }}>
+        <MonthlyRevenueChart data={analytics} />
+      </div>
+
+      {/* Top Selling Products */}
+
       <div
         className="recent-orders"
         style={{ marginTop: "30px" }}
@@ -83,9 +107,7 @@ function SalesReports() {
           <tbody>
             {topProducts.length === 0 ? (
               <tr>
-                <td colSpan="2">
-                  No sales available
-                </td>
+                <td colSpan="2">No sales available</td>
               </tr>
             ) : (
               topProducts.map((item, index) => (
