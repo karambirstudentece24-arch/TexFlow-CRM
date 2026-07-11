@@ -220,10 +220,11 @@ TexFlow-CRM
 
 # 👨‍💻 Author
 
-**Parth Randar**
 
-GitHub:
-https://github.com/Slayer04git
+**Parth Randar**
+**Karambir**
+
+
 
 ---
 
